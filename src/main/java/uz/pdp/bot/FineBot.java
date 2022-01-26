@@ -18,7 +18,7 @@ public class FineBot extends TelegramLongPollingBot {
             if(message.hasText()){
                 String text = message.getText();
                 switch (text){
-                    case "/start" -> execute(BotService.getMainMenu(update));
+                    case START -> execute(BotService.getMainMenu(update));
                 }
             }
         }
