@@ -30,4 +30,38 @@ public class DataService {
             return resultSet.getString(1);
         return null;
     }
+    public static String getFineByMonthAndCarId(int month,String carNumber) throws SQLException {
+        Connection connection = DbConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement("select json_agg(json_build_object('a',f)->'a') from fine f\n" +
+                "inner join car c on f.car_id = c.id\n" +
+                "where c.number=? and date_part('month',f.created_date::date)=?");
+        preparedStatement.setString(1,carNumber);
+        preparedStatement.setInt(2,month);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(resultSet.next())
+            return resultSet.getString(1);
+        return null;
+    }
+
+    public static String getFineByCarNumber(String number) throws SQLException {
+        Connection connection = DbConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement("select json_agg(json_build_object('a',f)->'a') from fine f\n" +
+                "inner join car c on f.car_id = c.id\n" +
+                "where c.number=?");
+        preparedStatement.setString(1,number);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(resultSet.next())
+            return resultSet.getString(1);
+        return null;
+    }
+
+    public static String getFineByUserIdNumber(long id) throws SQLException {
+        Connection connection = DbConnection.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement("select json_agg(json_build_object('a',f)->'a') from fine f where user_id=?");
+        preparedStatement.setLong(1,id);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if(resultSet.next())
+            return resultSet.getString(1);
+        return null;
+    }
 }
