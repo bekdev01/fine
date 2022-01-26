@@ -1,4 +1,4 @@
-package uz.pdp.bot.connet;
+package uz.pdp.connet;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

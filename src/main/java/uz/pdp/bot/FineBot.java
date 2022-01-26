@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import uz.pdp.bot.service.BotService;
+import uz.pdp.service.BotService;
 import uz.pdp.util.enums.SearchType;
 
 import static uz.pdp.util.enums.SearchType.*;
@@ -14,6 +14,7 @@ import static uz.pdp.util.Constant.*;
 public class FineBot extends TelegramLongPollingBot {
     SearchType searchType = null;
     int month;
+    boolean isPaid;
 
     @SneakyThrows
     @Override
@@ -29,16 +30,14 @@ public class FineBot extends TelegramLongPollingBot {
                     switch (searchType) {
                         case CAR -> {
                             try {
-                                long id = Long.parseLong(text);
-                                execute(BotService.getCarById(update, id));
+                                execute(BotService.getCarByNumber(update, text));
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage()));
                             }
                         }
                         case USER -> {
                             try {
-                                long id = Long.parseLong(text);
-                                execute(BotService.getUserById(update, id));
+                                execute(BotService.getUserByPassportCode(update, text));
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
                             }
@@ -54,9 +53,12 @@ public class FineBot extends TelegramLongPollingBot {
                             }
                         }
                         case MONTH_NUMBER -> {
-                                if(month==0)throw new Exception();
-                                execute(BotService.getFineByMonthAndNumber(update,month,text));
-                                searchType=MONTH_NUMBER;
+                                try {
+                                    execute(BotService.getFineByMonthAndNumber(update,month,text));
+                                    searchType=MONTH_NUMBER;
+                                }catch (Exception e) {
+                                    execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
+                                }
                         }
                         case NUMBER -> {
                             try {
@@ -68,7 +70,7 @@ public class FineBot extends TelegramLongPollingBot {
                         case FINE_USER -> {
                             try {
                                 long id = Long.parseLong(text);
-                                execute(BotService.getFineByUserIdEnd(update,id));
+                                execute(BotService.getFineByUserIdEnd(update,id,isPaid));
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
                             }
@@ -101,9 +103,11 @@ public class FineBot extends TelegramLongPollingBot {
                     execute(BotService.getNumberEdit(update));
                     searchType=NUMBER;
                 }
-                case SEARCH_CAR_BY_USER_ID -> {
+                case SEARCH_CAR_BY_USER_ID -> execute(BotService.getFineMenu(update));
+                case PAID_FINE,UNPAID_FINE -> {
                     execute(BotService.getFinesByUserId(update));
                     searchType=FINE_USER;
+                    isPaid=data.equals(PAID_FINE);
                 }
             }
         }

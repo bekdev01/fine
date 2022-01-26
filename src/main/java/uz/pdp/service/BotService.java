@@ -1,4 +1,4 @@
-package uz.pdp.bot.service;
+package uz.pdp.service;
 
 import org.telegram.telegrambots.meta.api.methods.groupadministration.SetChatPhoto;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -58,7 +58,7 @@ public class BotService {
         InlineKeyboardMarkup markup = InlineKeyboardService.createMarkup(List.of(
                 List.of(MENU)
         ));
-        EditMessageText editMessageText = new EditMessageText(SEARCH_CAT_TEXT);
+        EditMessageText editMessageText = new EditMessageText(SEARCH_CAR_TEXT);
         editMessageText.setChatId(message.getChatId().toString());
         editMessageText.setReplyMarkup(markup);
         editMessageText.setMessageId(message.getMessageId());
@@ -85,21 +85,21 @@ public class BotService {
         return sendMessage;
     }
 
-    public static SendMessage getCarById(Update update, long id) throws SQLException {
+    public static SendMessage getCarByNumber(Update update, String number) throws SQLException {
         Message message = update.hasMessage() ? update.getMessage() : update.getCallbackQuery().getMessage();
         InlineKeyboardMarkup markup = InlineKeyboardService.createMarkup(List.of(
                 List.of(MENU)
         ));
-        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), Objects.requireNonNull(DataService.getCarsById(id)));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), Objects.requireNonNull(DataService.getCarsByNumber(number)));
         sendMessage.setReplyMarkup(markup);
         return sendMessage;
     }
-    public static SendMessage getUserById(Update update, long id) throws SQLException {
+    public static SendMessage getUserByPassportCode(Update update, String passportCode) throws SQLException {
         Message message = update.hasMessage() ? update.getMessage() : update.getCallbackQuery().getMessage();
         InlineKeyboardMarkup markup = InlineKeyboardService.createMarkup(List.of(
                 List.of(MENU)
         ));
-        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), Objects.requireNonNull(DataService.getUsersById(id)));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), Objects.requireNonNull(DataService.getUsersByPassportCode(passportCode)));
         sendMessage.setReplyMarkup(markup);
         return sendMessage;
     }
@@ -168,12 +168,25 @@ public class BotService {
         return sendMessage;
     }
 
-    public static SendMessage getFineByUserIdEnd(Update update, long id) throws SQLException {
+    public static SendMessage getFineByUserIdEnd(Update update, long id,boolean isPaid) throws SQLException {
         Message message = update.hasMessage() ? update.getMessage() : update.getCallbackQuery().getMessage();
         InlineKeyboardMarkup markup = InlineKeyboardService.createMarkup(List.of(
                 List.of(MENU)
         ));
-        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), Objects.requireNonNull(DataService.getFineByUserIdNumber(id)));
+        SendMessage sendMessage = new SendMessage(message.getChatId().toString(), Objects.requireNonNull(DataService.getFineByUserIdNumber(id,isPaid)));
+        sendMessage.setReplyMarkup(markup);
+        return sendMessage;
+    }
+
+    public static EditMessageText getFineMenu(Update update) {
+        Message message = update.hasMessage() ? update.getMessage() : update.getCallbackQuery().getMessage();
+        InlineKeyboardMarkup markup = InlineKeyboardService.createMarkup(List.of(
+                List.of(PAID_FINE,UNPAID_FINE),
+                List.of(MENU)
+        ));
+        EditMessageText sendMessage = new EditMessageText(CHOOSE_ACTION);
+        sendMessage.setMessageId(message.getMessageId());
+        sendMessage.setChatId(message.getChatId().toString());
         sendMessage.setReplyMarkup(markup);
         return sendMessage;
     }

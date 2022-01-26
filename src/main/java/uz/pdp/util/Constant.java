@@ -12,11 +12,13 @@ public interface Constant {
     String SEARCH_FINE="Search Fine";
     String START="/start";
     String CHOOSE_ACTION="Choose action";
-    String SEARCH_CAT_TEXT="Car id: ";
-    String SEARCH_USER_TEXT="User id: ";
+    String SEARCH_CAR_TEXT="Car Number: ";
+    String SEARCH_USER_TEXT="Passport code: ";
     String MONTH_TEXT="Month(1-12): ";
     String CAR_NUMBER_TEXT="Number: ";
-    String USER_ID_TEXT="User Id: ";
+    String USER_ID_TEXT="User id: ";
+    String PAID_FINE="Paid";
+    String UNPAID_FINE="Unpaid";
 
     String SEARCH_CAR_BY_MONTH_AND_NUMBER="Search by Month";
     String SEARCH_CAR_BY_NUMBER="Search by Car Number";
