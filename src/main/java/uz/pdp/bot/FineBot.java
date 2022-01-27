@@ -2,6 +2,8 @@ package uz.pdp.bot;
 
 import lombok.SneakyThrows;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import uz.pdp.service.BotService;
@@ -19,6 +21,7 @@ public class FineBot extends TelegramLongPollingBot {
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
+        long start = System.currentTimeMillis();
         if (update.hasMessage()) {
             Message message = update.getMessage();
             if (message.hasText()) {
@@ -30,14 +33,20 @@ public class FineBot extends TelegramLongPollingBot {
                     switch (searchType) {
                         case CAR -> {
                             try {
-                                execute(BotService.getCarByNumber(update, text));
+                                SendMessage sendMessage = BotService.getCarByNumber(update, text);
+                                long end = System.currentTimeMillis();
+                                sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                                execute(sendMessage);
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage()));
                             }
                         }
                         case USER -> {
                             try {
-                                execute(BotService.getUserByPassportCode(update, text));
+                                SendMessage sendMessage = BotService.getUserByPassportCode(update, text);
+                                long end = System.currentTimeMillis();
+                                sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                                execute(sendMessage);
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
                             }
@@ -46,7 +55,10 @@ public class FineBot extends TelegramLongPollingBot {
                                 int num = Integer.parseInt(text);
                                 if(num<1 || num>12)throw new Exception();
                                 month=num;
-                                execute(BotService.getNumber(update));
+                                SendMessage sendMessage = BotService.getNumber(update);
+                                long end = System.currentTimeMillis();
+                                sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                                execute(sendMessage);
                                 searchType=MONTH_NUMBER;
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
@@ -54,7 +66,10 @@ public class FineBot extends TelegramLongPollingBot {
                         }
                         case MONTH_NUMBER -> {
                                 try {
-                                    execute(BotService.getFineByMonthAndNumber(update,month,text));
+                                    SendMessage sendMessage = BotService.getFineByMonthAndNumber(update, month, text);
+                                    long end = System.currentTimeMillis();
+                                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                                    execute(sendMessage);
                                     searchType=MONTH_NUMBER;
                                 }catch (Exception e) {
                                     execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
@@ -62,7 +77,10 @@ public class FineBot extends TelegramLongPollingBot {
                         }
                         case NUMBER -> {
                             try {
-                                execute(BotService.getFineByCarNumber(update,text));
+                                SendMessage sendMessage = BotService.getFineByCarNumber(update, text);
+                                long end = System.currentTimeMillis();
+                                sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                                execute(sendMessage);
                             }catch (Exception e){
                                 execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
                             }
@@ -70,7 +88,10 @@ public class FineBot extends TelegramLongPollingBot {
                         case FINE_USER -> {
                             try {
                                 long id = Long.parseLong(text);
-                                execute(BotService.getFineByUserIdEnd(update,id,isPaid));
+                                SendMessage sendMessage = BotService.getFineByUserIdEnd(update, id, isPaid);
+                                long end = System.currentTimeMillis();
+                                sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                                execute(sendMessage);
                             } catch (Exception e) {
                                 execute(BotService.exception(update, e.getMessage() == null ? "Exception" : e.getMessage()));
                             }
@@ -83,29 +104,57 @@ public class FineBot extends TelegramLongPollingBot {
             String data = update.getCallbackQuery().getData();
             switch (data) {
                 case MENU -> {
-                    execute(BotService.getMainMenuEdit(update));
+                    EditMessageText sendMessage = BotService.getMainMenuEdit(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
                     searchType = null;
                 }
                 case SEARCH_USER -> {
-                    execute(BotService.searchUser(update));
+                    EditMessageText sendMessage =BotService.searchUser(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
                     searchType = USER;
                 }
                 case SEARCH_CAR -> {
-                    execute(BotService.searchCar(update));
+                    EditMessageText sendMessage =BotService.searchCar(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
                     searchType = CAR;
                 }
-                case SEARCH_FINE -> execute(BotService.searchFine(update));
+                case SEARCH_FINE -> {
+                    EditMessageText sendMessage =BotService.searchFine(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
+                }
                 case SEARCH_CAR_BY_MONTH_AND_NUMBER -> {
-                    execute(BotService.getMonth(update));
+                    EditMessageText sendMessage =BotService.getMonth(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
                     searchType=MONTH;
                 }
                 case SEARCH_CAR_BY_NUMBER -> {
-                    execute(BotService.getNumberEdit(update));
+                    EditMessageText sendMessage = BotService.getNumberEdit(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
                     searchType=NUMBER;
                 }
-                case SEARCH_CAR_BY_USER_ID -> execute(BotService.getFineMenu(update));
+                case SEARCH_CAR_BY_USER_ID -> {
+                    EditMessageText sendMessage =BotService.getFineMenu(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
+                }
                 case PAID_FINE,UNPAID_FINE -> {
-                    execute(BotService.getFinesByUserId(update));
+                    EditMessageText sendMessage =BotService.getFinesByUserId(update);
+                    long end = System.currentTimeMillis();
+                    sendMessage.setText(sendMessage.getText().concat("\nJAVA Execution Time: ").concat(String.valueOf(end-start)).concat(" ms"));
+                    execute(sendMessage);
                     searchType=FINE_USER;
                     isPaid=data.equals(PAID_FINE);
                 }
